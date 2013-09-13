@@ -1,0 +1,153 @@
+/*
+ * Solarized palette
+ * base03    #002b36
+ * base02    #073642
+ * base01    #586e75
+ * base00    #657b83
+ * base0     #839496
+ * base1     #93a1a1
+ * base2     #eee8d5
+ * base3     #fdf6e3
+ * yellow    #b58900
+ * orange    #cb4b16
+ * red       #dc322f
+ * magenta   #d33682
+ * violet    #6c71c4
+ * blue      #268bd2
+ * cyan      #2aa198
+ * green     #859900
+ */
+
+html, body {
+  color: #657b83;
+  background-color: #fdf6e3;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Open Sans", sans;
+}
+
+.navbar {
+  width: 100%;
+  border-bottom: 2px solid #b58900;
+  display: block;
+  text-align: left;
+}
+
+.navitem {
+  line-height: 200%;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  display: inline-block;
+}
+
+.navitem a.sitelink {
+  background-color: #b58900;
+  color: #fdf6e3;
+  
+  text-decoration: none;
+  font-weight: bold;
+  padding: 8px 15px;
+}
+
+.navitem a.sitelink:hover {
+  background-color: #dc322f;
+}
+
+.navitem a.navlink {
+  color: #b58900; 
+  
+  text-decoration: none;
+  padding: 8px 15px;
+}
+
+.navitem a.navlink:hover {
+  color: #dc322f;
+}
+
+a, a:active, a:visited {
+  text-decoration: none;
+  color: #268bd2;
+}
+
+a:hover {
+  color: #dc322f;
+}
+
+#content h1.pagetitle {
+  font-size: 350%;
+  color: #859900;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  color: #cb4b16;
+  font-weight: light;
+  border-bottom: 1px solid #657b83;
+}
+
+.contactbar {
+  width: 100%;
+  background-color: #002b36;
+  display: block;
+  text-align: center;
+}
+
+.contactitem {
+  line-height: 200%;
+  display: inline-block;
+}
+
+.contactitem a {
+  text-decoration: none;
+  padding: 10px 40px;
+}
+
+
+#content {
+  padding: 10px;
+  text-align: left;
+}
+
+#content .highlight {
+  margin-left: 30px;
+  padding: 6px;
+  width: 90%;
+}
+
+#content .highlight pre {
+    margin: 0px;
+    padding: 0px;
+    overflow-x: auto;
+}
+
+
+#xwrap {
+  margin: 0 auto;
+  text-align: center;
+  min-width: 500px;
+  max-width: 800px;
+  min-height: 100%;
+  position: relative;
+  padding-bottom: 40px;
+}
+
+#ywrap {
+  min-height: 100%;
+  position: relative;
+}
+
+#footer {
+  clear: both;
+  width: 100%;
+  height: 40px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  font-size: 12px;
+  text-align: center;
+  color: #93a1a1;
+  background-color: #eee8d5;
+}
+

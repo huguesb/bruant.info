@@ -1,0 +1,29 @@
+name: HB
+description: stuff
+
+port:        4000
+baseurl:     /
+url:         http://bruant.info
+
+exclude:     [README.md]
+
+future:      true
+pygments:    true
+markdown:    maruku
+permalink:   date
+
+maruku:
+  use_tex:    false
+  use_divs:   false
+  png_engine: blahtex
+  png_dir:    images/latex
+  png_url:    /images/latex
+
+kramdown:
+  auto_ids: true,
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  use_coderay: false
+
+
