@@ -550,26 +550,27 @@ a cert signed by an unknown CA.
 
 What is missing is more significant than what is there. Crucially there is no CGI
 configuration in sight, which means this site is made of good old static HTML.
-nginx can easily be configured to serve Perl, PHP, Python, Ruby, or whatever language
-the cool kids use these days but you'll have to look elsewhere for a tutorial.
+If you want to use Perl, PHP, Python, Ruby, or whatever language the cool kids use
+these days you'll have to read through nginx's documentation.
 
 
-### Update/Deploy cycle
+### Generating and deploying content
 
 Static website generators are all the rage lately, especially since the rise of
 [Markdown](http://daringfireball.net/projects/markdown/). The ease of editing
 simple text files, running a test server locally and managing code with
 [git](http://git-scm.org) is unrivaled.
 
-I picked [Jekyll](http://jekyllrb.com/) and I'm pretty satisfied so far but
-you would do well to evaluate a couple solutions to see what suits you best.
+I picked [Jekyll](http://jekyllrb.com/) and I'm pretty satisfied so far but the
+git-based deploy process outlined below should be fairly easy to adapt to any
+other static website generator.
 
 Ubuntu 12.04 comes with an old version of [Ruby](https://www.ruby-lang.org/en/),
 thankfully this can easily be worked around by using [rvm](http://rvm.io). You
 need to install Jekyll on both your server and your local machine:
 
 {%highlight bash%}
-curl -L https://get.rvm.io | bash -s stable
+curl -L https://get.rvm.io | bash -s stable --auto-dotfiles
 sudo rvm install 1.9.3
 rvm use 1.9.3
 gem install jekyll
@@ -592,8 +593,6 @@ tmp=\$(mktemp -d)
 GIT_WORK_TREE=\$tmp git checkout -f
 
 # build site from temporary tree
-source ~/.bash_profile
-rvm use 1.9.3
 jekyll build -s \$tmp -d \$dst
 
 # cleanup
