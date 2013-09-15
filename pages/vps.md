@@ -3,35 +3,39 @@ layout: page
 title: VPS Setup
 ---
 
-If, like me, you someday decide to declare your independence from email and blog
-providers that hold your data hostage and may or may not do unspeakable things
-with it, this page is for you. 
+After years of thinking about it I finally took the plunge and configured my
+own email and web server. When I first considered it, I viewed it as a geeky
+rite of passage and I thought redirecting my own email domain to e.g. Google
+mail servers would be good enough.
 
-I opted to use a [VPS](http://en.wikipedia.org/wiki/Virtual_private_server) instead
-of a dedicated server because I was traveling too much and didn't have a good
-enough network connection at home but the instructions below should work perfectly
-with a dedicated server.
+The Snowden leaks made me seriously rethink the importance and scope of this
+project. I am not paranoid enough to think I could be considered a target
+worthy of snooping, however, as Ken White eloquently puts it, ["I am the other"](http://www.popehat.com/2013/09/06/nsa-codebreaking-i-am-the-other/).
 
-**NOTE**: This guide assumes a basic grasp of UNIX command line. Unless otherwise
-indicated, all commands mentioned in this guide are run as root on the server.
+This guide describes the process I went through, in a way that is hopefully clear
+enough to be reproducible by like-minded individuals. A basic grasp of UNIX command
+line is assumed. Path and domain name information where copied verbatim from my own
+setup and will need to be adapted. I tried to strike a balance between accessibility
+and concision but I expect it can be improved. [Comments are welcome](mailto:hugues@bruant.info).
 
-For simplicity I preserved path and domain names in all comands. It goes without
-saying that someone trying to reproduce this setup should adapt these values.
+Although I opted to use a [VPS](http://en.wikipedia.org/wiki/Virtual_private_server)
+because I was traveling too much and didn't have a good enough network connection
+at home, all the instructions below should work perfectly with a dedicated server.
 
 
 Domain and Host
 ---------------
 
-This is the first step and the most significant barrier: are you willing to **pay**
-for email and blog hosting? If you're a control-freak or just privacy conscious,
-find a registar, pick a domain name that suits you and buy it. Then find a VPS provider,
-pick a configuration that suits you and .
+Select a registar and a hosting provider, pick a domain name and a VPS configuration,
+take out your credit card (or bitcoins or whatever means of payment are accepted),
+confirm your order and get ready for a serious command line session.
 
 I used [Gandi](https://gandi.net) as both my registar and my VPS provider because
 it has very competitive pricing, good service and servers in the EU.
 
-Then configure the DNS records of your freshly acquired domain name to point
-to your VPS. For instance my zone file looks like this:
+You'll need to configure the DNS records of your freshly acquired domain name to point
+to your VPS. Most providers will offer some kind of fancy graphical way of editing
+DNS records but I prefer editing the zone file by hand:
 
 {%highlight text%}
 @ 10800 IN A 46.226.109.60
@@ -41,7 +45,7 @@ to your VPS. For instance my zone file looks like this:
 @ 10800 IN MX 10 @
 {%endhighlight%}
 
-The first line points my domain name to the IP address assigned to my server.
+The first line points the domain name to the static IP address assigned to the VPS.
 The second line points all subdomains to the same address.
 
 The next two lines have the exact same role but for [IPv6](http://en.wikipedia.org/wiki/IPv6).
@@ -203,20 +207,22 @@ it's supported by dovecot and I hear it 's not hard to setup).
 {%endhighlight%}
 
 The script will prompt you for some fields of the Distinguished Name of the
-certs. Answer carefully, at the very least for the CN field or your certs
+certs. Answer carefully, at the very least for the CN field, or your certs
 may be rejected by some servers/clients. In particular the CN of the SMTP
-cert MUST be coherent with your mail domain.
+cert MUST match your mail domain.
 
 
 ### Dovecot
 
 Dovecot provides a couple of different components of interest to us:
-* SASL authentication with pluggable backends
-* IMAP server that allows you to access your emails from a remote client
-  (mobile or desktop)
-* LMTP server that sits between Postfix and your local mailbox
-* a [Sieve](http://sieve.info/) interpreter for powerful and flexible
-  customization of the behavior of said LMTP server
+* [SASL](http://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer)
+  authentication with pluggable backends
+* [IMAP](http://en.wikipedia.org/wiki/Internet_Message_Access_Protocol) server
+  to access your emails from a remote client (mobile or desktop)
+* [LMTP](http://en.wikipedia.org/wiki/Local_Mail_Transfer_Protocol) server that 
+  sits between Postfix and local maildirs
+* [Sieve](http://sieve.info/) interpreter to customize the behavior of said LMTP
+  server
 
 First, we need to enable IMAP and LMTP in `/etc/dovecot/dovecot.conf` :
 {%highlight text%}
@@ -303,12 +309,12 @@ buntil you look into `/var/log/upstart/dovecot.log`.
 
 ### Postfix
 
-Postifx is our SMTP server, the crucial component that talks to remote SMTP
-servers and ensures that email gets routed correctly.
+Postifx is our SMTP server, the crucial component that ensures that both incoming
+and outgoing emails get routed correctly.
 
 The main postfix configuration is stored in `/etc/postfix/main.cf`. Mine uses
-virtual mailboxes, enables TLS, proxies SASL auth through Dovecot and pipes all
-emails to Dovecot LMTP server (mostly to benefit from Sieve scripting):
+virtual mailboxes, pipes all emails to Dovecot LMTP, enables TLS and proxies SASL
+auth through Dovecot:
 
 {%highlight text%}
 myhostname = bruant.info
@@ -351,7 +357,6 @@ broken_sasl_auth_clients = yes
 smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination
 {%endhighlight%}
 
-**NB** Make sure to adapt `myhostname`
 
 In `/etc/postfix/master.cf` make sure the smtp and submission protocols are
 handled correctly. It is particularly important to get the "chroot" option
@@ -500,12 +505,12 @@ Web
 ---
 
 Your VPS is now working smoothly and providing you with a premium email service.
-You might as well install a web server on it as well to take back the control of
-your online identity.
+You might as well install a web server to host your homepage and/or your blog,
+thereby taking back some control over your online identity.
 
 Again, there are a variety of viable Open Source alternatives but I'm going to
-pick [nginx](https://nginx.org) which is pretty efficient, fairly powerful and
-very easy to setup.
+pick [nginx](https://nginx.org) which is very efficient, quite powerful and
+extremely easy to setup.
 
 {%highlight bash%}
 apt-get install nginx
@@ -593,6 +598,8 @@ tmp=\$(mktemp -d)
 GIT_WORK_TREE=\$tmp git checkout -f
 
 # build site from temporary tree
+source ~/.bash_profile
+rvm use 1.9.3
 jekyll build -s \$tmp -d \$dst
 
 # cleanup
@@ -764,8 +771,8 @@ mail._domainkey 10800 IN TXT "v=DKIM1; k=rsa; t=y; p=MIGfMA0GCSqGSIb3DQEBAQUAA4G
 {%endhighlight%}
 
 For DKIM to work you will need reverse-DNS lookup to work. This is usually
-configured via the control panel of your VPS provider. To verify the correct
-mapping:
+configured via the control panel of your VPS provider. Use `dig` to verify the
+correct mapping.
 
 {%highlight bash%}
 $ dig +nocmd +noquestion +nocomments +nostats -x 46.226.109.60
@@ -801,7 +808,7 @@ localhost
 bruant.info
 {%endhighlight%}
 
-Finally we need to configure how the OpenDKIM will communicate with postfix.
+Finally we need to configure how OpenDKIM will communicate with postfix.
 This is controlled by `/etc/default/opendkim`, which should look like:
 
 {%highlight bash%}
@@ -839,11 +846,11 @@ own SPF-related records look like:
 
 The duplication may not be necessary but better safe than sorry.
 
-**NOTE** GMail documentation warn that strict constraint "-" as opposed to "~"
+**NOTE** GMail documentation warn that strict constraints ("-" as opposed to "~")
 may be problematic.
 
 It is also possible to enforce SPF checking on incoming emails. I didn't do it
-yet so I cannot describe the process but the some kind Ubuntu user made a
+yet so I cannot describe the process but some kind Ubuntu user made a
 [basic guide](https://help.ubuntu.com/community/Postfix/SPF).
 
 
@@ -856,17 +863,14 @@ unwilling to go through the hassle of signing/encrypting emails.
 But lo and behold, I stumbled upon a guy describing how he
 [encrypts all incoming emails](https://grepular.com/Automatically_Encrypting_all_Incoming_Email).
 It's not as good as end-to-end encryption but at least it means emails are
-encrypted at rest on the server, which is a pretty significant step up
-considering that I do not have physical control of said server.
+encrypted at rest on the server, a pretty significant step up in a VPS context.
 
 The original guide was for [Exim](http://exim.org) but a kind soul took care of
 adapting the process to [work with Dovecot](https://perot.me/encrypt-specific-incoming-emails-using-dovecot-and-sieve).
 
-Part of the reason I used a recent version of Dovecot from a PPA instead of the
-old version packaged for 12.04 was that it drastically simplify said process
-drastically. No need to build anything from source, the only steps left are
-configuring Dovecot to find the sieve script and adding the appropriate public
-key to the GPG keyring.
+Using a recent version of Dovecot from a PPA (or built from source) drastically
+simplifies the process: the only steps left are configuring Dovecot to find the
+sieve script and adding the appropriate public key to the GPG keyring.
 
 I made slight modifications to the sieve script to keep encrypted emails in
 the same inbox as other emails and avoid encrypting emails sent from my own
@@ -891,10 +895,13 @@ Work In Progress
 
 If you spot errors in the above instructions, please [let me know](mailto:hugues@bruant.info).
 
-I really want to install my own OpenID provider at some point in the future,
-or at the very least route OpenID delegation through my own domain...
+Ideally I'd like to [puppetize](http://puppetlabs.com/) or otherwise automate as
+much of the process as possible. Any contributions towards that goal would be
+much appreciated.
 
-If you have done it (or even tried and failed) I'd love to hear about your experience.
+I really want to install my own OpenID provider at some point in the future,
+or at the very least route OpenID delegation through my own domain... If you have
+done it (or even just attempted it) I'd love to hear about your experience.
 
 
 Sources
