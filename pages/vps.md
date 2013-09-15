@@ -72,7 +72,7 @@ apt-get update
 apt-get upgrade
 apt-get purge gandi-hosting-agent
 apt-get install htop tmux lynx telnet lsof mercurial git libtool \
-python-software-properties software-properties-common strace sqlite3 gnupg 
+python-software-properties software-properties-common strace sqlite3 gnupg
 {%endhighlight%}
 
 For password-less login to your server, add your public key to `~/.ssh/authorized_keys`.
@@ -181,7 +181,7 @@ plugin to script my email server. Thankfully, somebody created a [PPA](https://l
 with a suitably fresh version.
 
 **NB:** The truly paranoid should not trust a random PPA but build the package from source
-instead. 
+instead.
 
 {%highlight bash%}
 add-apt-repository ppa:kokelnet/dovecot22
@@ -219,7 +219,7 @@ Dovecot provides a couple of different components of interest to us:
   authentication with pluggable backends
 * [IMAP](http://en.wikipedia.org/wiki/Internet_Message_Access_Protocol) server
   to access your emails from a remote client (mobile or desktop)
-* [LMTP](http://en.wikipedia.org/wiki/Local_Mail_Transfer_Protocol) server that 
+* [LMTP](http://en.wikipedia.org/wiki/Local_Mail_Transfer_Protocol) server that
   sits between Postfix and local maildirs
 * [Sieve](http://sieve.info/) interpreter to customize the behavior of said LMTP
   server
@@ -589,7 +589,7 @@ directory from which nginx serves the files:
 {%highlight bash%}
 git --bare init
 cat - > hooks/post-receive <<END
-#!/bin/bash
+#!/bin/bash -l
 
 dst=/srv/data01/www/bruant.info
 tmp=\$(mktemp -d)
@@ -598,8 +598,6 @@ tmp=\$(mktemp -d)
 GIT_WORK_TREE=\$tmp git checkout -f
 
 # build site from temporary tree
-source ~/.bash_profile
-rvm use 1.9.3
 jekyll build -s \$tmp -d \$dst
 
 # cleanup
@@ -632,7 +630,7 @@ git push deploy master
 
 There are a bunch of tools, open or closed, free or commercial, CLI or GUI, that
 extract stats from server logs. After considering a couple of alternatives I settled
-on [awstats](awstats.org). It gives a good overview of traffic statistics via a
+on [awstats](http://awstats.org). It gives a good overview of traffic statistics via a
 decent looking webpage  and it is [pretty easy to install](http://kamisama.me/2013/03/20/install-configure-and-protect-awstats-for-multiple-nginx-vhost-on-debian).
 
 **WARNING:** At the time of this writing (September 13 2013) the above guide contains
