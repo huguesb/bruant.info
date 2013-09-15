@@ -1,0 +1,20 @@
+---
+layout: base
+---
+<h1 class="pagetitle">{{article.title}}</h1>
+
+{{article.synopsis}}
+
+<h3>Table of contents</h3>
+
+<ol>
+{% for section in article.sections %}
+    <li><a href="#section-{{section.index}}">{{section.name}}</a></li>
+{% endfor %}
+</ol>
+
+{% for section in article.sections %}
+    <a href="#" class="backtotop">top</a>
+    <h2 id="section-{{section.index}}">{{section.name}}</h2>
+    {{section.content}}
+{% endfor %}

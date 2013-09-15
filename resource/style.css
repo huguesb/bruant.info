@@ -44,7 +44,7 @@ html, body {
 .navitem a.sitelink {
   background-color: #b58900;
   color: #fdf6e3;
-  
+
   text-decoration: none;
   font-weight: bold;
   padding: 8px 15px;
@@ -55,8 +55,8 @@ html, body {
 }
 
 .navitem a.navlink {
-  color: #b58900; 
-  
+  color: #b58900;
+
   text-decoration: none;
   padding: 8px 15px;
 }
@@ -72,6 +72,12 @@ a, a:active, a:visited {
 
 a:hover {
   color: #dc322f;
+}
+
+a.backtotop {
+    text-decoration: none;
+    line-height: 200%;
+    float: right;
 }
 
 #content h1.pagetitle {
