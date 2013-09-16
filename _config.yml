@@ -8,7 +8,7 @@ url:         http://bruant.info
 articles:      ./_articles
 articles_dest: ./articles
 
-exclude:     [README.md]
+exclude:     [README.md, bsd.txt, cc-by-sa-3.0.txt]
 
 future:      true
 pygments:    true
