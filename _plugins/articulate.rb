@@ -25,67 +25,84 @@
 module Jekyll
     #
     # Articulate is a simple Jekyll generator plugin meant to ease the creation
-    # of long-form articles. It takes a source tree of the following form:
+    # of long-form articles. It is centered around the idea that an article is
+    # a collection of sections which can be paginated.
+    #
+    # It takes a source tree of the following form:
     #
     # _articles/
     #     foobar/
     #          _article.yml
     #          01-intro.md
     #          02-foo.md
-    #          03-bar.md
+    #          99-bar.md
     #     bazqux/
     #          _article.yml
     #          01-qux.md
-    #          02-baz.md
+    #          42-baz.md
     #
-    # And produces an output of the form:
+    # And may produce an output of the form:
     #
     # articles/
     #     foobar/
     #          01-intro.html
     #          02-foo.html
-    #          03-bar.html
+    #          99-bar.html
     #          index.html
     #          full.html
     #     bazqux/
     #          01-qux.html
-    #          02-baz.html
+    #          42-baz.html
     #          index.html
-    #          full.html
     #
     # Where:
     #     * index.html is a table of contents linking to each section
     #     * full.html is a print-friendly single-page version of the article
     #     * the other files are single-section pages
     #
-    # _article.yml is used to set variables (e.g. article title) that can be
-    # accessed through Liquid markup in the layouts and individual sections.
+    #
+    # _article.yml is used to set article-wide Liquid-accessible variables (e.g.
+    # article title) and to control creation of special pages.
+    #
+    # In the above example, foobar/_article.yml looks like:
+    #
+    # title: Foobar
+    # synopsis: Rise and fall of the Foobar empire
+    # special: [index, full]
+    #
+    #
+    # A special page is basically an article-aware rendering of a layout from an
+    # empty content. The most typical use cases are the index.html and full.html
+    # pages in the above example. When a value "foo" is specified in the list
+    # of special pages, Articulate will attempt to generate a file name foo.html
+    # using layout article_foo
+    #
     #
     # The YAML frontmatter of an article section differs slightly from that of
     # a regular page:
     #     - the section title MUST be specified in the 'name' variable
     #     - the 'title' variable is ignored: the 'page.title' variable in Liquid
-    #     is derived from the article and section titles
-    #     - the layout variable is not taken into account:
-    #          * the index page uses 'article_index'
-    #          * single-section pages use 'article_section'
-    #          * the print-friendly combined page uses 'article_full'
+    #       is derived from the article and section titles
+    #     - the layout variable is not taken into account: single-section pages
+    #       always use 'article_section'
     #
     # Sections are ordered within the article by the alphabetical order of the
     # source files, hence the use of numerical prefixes in the example above.
     # Each section is assigned a Liquid-accessible numerical index (0-based).
     #
+    #
     # The following variable structure is Liquid-accessible in all article-aware
-    # pages (i.e. all articles sections but also the special pages generated
-    # from article_full and article_index layouts):
+    # pages (i.e. articles sections and special pages):
     #
     # article:
     #     tile: Foobar
     #     # any other value specified in _article.yml
-    #     full:
-    #          url: /articles/foobar/full.html
-    #     index:
-    #          url: /articles/foobar/index.html
+    #     special:
+    #          full:
+    #               url: /articles/foobar/full.html
+    #          index:
+    #               url: /articles/foobar/index.html
+    #          ...
     #     sections: [
     #          {
     #               url: /articles/foobar/01-foo.html
@@ -97,7 +114,6 @@ module Jekyll
     #          },
     #          ...
     #     ]
-    #
     #
     #
     # Articulate honors the following _config.yml options:
@@ -113,22 +129,17 @@ module Jekyll
             def generate(site)
                 src = site.config['articles']
                 src = './_articles' if src == nil
-                path = File.join(site.source, src)
 
                 dst = site.config['articles_dest']
                 dst = './articles' if dst == nil
 
-                site.filter_entries(Dir.entries(path)).each do |article|
+                site.sources(src).each do |article|
                     Article.new(site, src, dst, article).generate()
                 end
             end
-
         end
     end
 
-    #
-    # An Article is a collection of Section and a few accompanying SpecialPages
-    #
     class Article
         attr_reader :site, :name, :src_dir, :dst_dir
 
@@ -137,37 +148,30 @@ module Jekyll
             @name = name
             @src_dir = File.join(src, name)
             @dst_dir = File.join(dst, name)
-
-            yaml = File.join(@src_dir, '_article.yml')
-            @liquid = File.file?(yaml) ? YAML.safe_load_file(yaml) : {}
+            @liquid = YAML.safe_load_file(File.join(@src_dir, '_article.yml'))
         end
 
         def generate()
             @sections = []
-            @full = SpecialPage.new(self, 'full')
-            @index = SpecialPage.new(self, 'index')
+            @special = @liquid['special'].map {|x| SpecialPage.new(self, x)}
 
-            n = 0
-            @site.filter_entries(Dir.entries(File.join(@site.source, @src_dir)))
-                .sort.each do |file|
-                section = Section.new(self, file, n)
-                @site.pages << section
-                @sections << section
-                n += 1
+            @site.sources(@src_dir).sort.each do |file|
+                @sections << Section.new(self, file, @sections.length)
             end
+
+            @site.pages.concat(@sections)
 
             # MUST add special pages last to ensure that they are rendered
             # **AFTER** all sections and can therefore safely access fully
             # converted content
-            @site.pages << @index << @full
+            @site.pages.concat(@special)
         end
 
         def to_liquid
-            {
+            @liquid.deep_merge({
                 'sections' => @sections.map {|x| x.to_liquid},
-                'full' => @full.to_liquid,
-                'index' => @index.to_liquid
-            }.deep_merge(@liquid)
+                'special' => Hash[@special.map {|x| [x.basename, x.to_liquid]}]
+            })
         end
 
         def title
@@ -175,9 +179,6 @@ module Jekyll
         end
     end
 
-    #
-    # Simple Page subclass that factors out common code
-    #
     class ArticleAwarePage < Page
         def initialize(article)
             @article = article
@@ -186,21 +187,14 @@ module Jekyll
             @dir = @article.dst_dir
         end
 
-        # overriden to make per-article variables Liquid-available
         def render(layouts, site_payload)
-            payload = {
+            super(layouts, site_payload.deep_merge({
                 'article' => @article.to_liquid
-            }.deep_merge(site_payload)
-
-            super(layouts, payload)
+            }))
         end
     end
 
-    #
-    # Page subclass used to generate per-section page
-    #
     class Section < ArticleAwarePage
-        # expose section index to Liquid
         attr_reader :index
         ATTRIBUTES_FOR_LIQUID = Page::ATTRIBUTES_FOR_LIQUID + %w[index]
 
@@ -212,31 +206,30 @@ module Jekyll
             self.process(@name)
             self.read_yaml(File.join(@base, @article.src_dir), @name)
 
-            # enforce title and layout
             # TODO: customize title pattern?
             self.data['title'] = @article.title + ' : ' + self.data['name']
             self.data['layout'] = 'article_section'
         end
     end
 
-    #
-    # Page subclass used to generate index page and full-article page
-    #
     class SpecialPage < ArticleAwarePage
         def initialize(article, name)
             super(article)
-
             @name = name + '.html'
 
             self.process(@name)
-
-            # enforce title and layout
+            self.content = ""
             self.data = {
                 'title' => @article.title,
                 'layout' => 'article_' + name
             }
+        end
+    end
 
-            self.content = ""
+    # monkey-patching for the win
+    class Site
+        def sources(dir)
+            filter_entries(Dir.entries(File.join(self.source, dir)))
         end
     end
 end
