@@ -9,6 +9,9 @@ Canonical repository: <http://gitorious.org/bruant-info>
 License
 -------
 
+
+Copyright &copy; 2013, Hugues Bruant <hugues@bruant.info>
+
 * content (i.e. all markdown files) is available under the terms of Creative
   Commons Attribution-ShareAlike 3.0
   See cc-by-sa-3.0.txt for details

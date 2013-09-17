@@ -41,6 +41,6 @@ This site
 
 Built with [Jekyll](http://jekyllrb.com), using the [Solarized](http://ethanschoonover.com/solarized)
 color scheme, the [Open Sans](http://www.google.com/fonts#QuickUsePlace:quickUse/Family:Open+Sans)
-typeface and a custom layout.
+typeface and a [custom layout](http://gitorious.org/bruant-info).
 
-Running on a small [VPS](/pages/vps.html) hosted by [Gandi](https://gandi.net).
+Running on a small [VPS](/articles/vps-setup/) hosted by [Gandi](https://gandi.net).

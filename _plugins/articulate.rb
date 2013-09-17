@@ -88,14 +88,15 @@ module Jekyll
     #
     # Sections are ordered within the article by the alphabetical order of the
     # source files, hence the use of numerical prefixes in the example above.
-    # Each section is assigned a Liquid-accessible numerical index (0-based).
+    # Each section is assigned a numerical index (0-based), Liquid-accessible as
+    # 'page.index'.
     #
     #
     # The following variable structure is Liquid-accessible in all article-aware
     # pages (i.e. articles sections and special pages):
     #
     # article:
-    #     tile: Foobar
+    #     title: Foobar
     #     # any other value specified in _article.yml
     #     special:
     #          full:
@@ -191,6 +192,27 @@ module Jekyll
             super(layouts, site_payload.deep_merge({
                 'article' => @article.to_liquid
             }))
+        end
+
+        def do_layout(payload, layouts)
+            info = { :filters => [Jekyll::Filters],
+                     :registers => { :site => self.site,
+                                     :page => payload['page'],
+                                     :article => payload['article'] } }
+
+            # render and transform content (this becomes the final content of the object)
+            payload["pygments_prefix"] = converter.pygments_prefix
+            payload["pygments_suffix"] = converter.pygments_suffix
+
+            self.content = self.render_liquid(self.content,
+                                                payload,
+                                                info)
+            self.transform
+
+            # output keeps track of what will finally be written
+            self.output = self.content
+
+            self.render_all_layouts(layouts, payload, info)
         end
     end
 

@@ -8,6 +8,8 @@ Active
 
 Projects I am working on, although activity may be erratic due to lack of spare time.
 
+* [Articulate](http://gitorious.org/articulate): a [Jekyll](http://jekyllrb.com) plugin
+  to ease creation of long-form articles.
 * [QCodeEdit](http://qcodeedit.org): framework to create powerful text editors based on Qt4
 * [RotiDeCode](http://rotideco.de): simple text editor based on QCodeEdit **\[WIP / PLAYGROUND\]**
 
