@@ -149,7 +149,7 @@ module Jekyll
             @name = name
             @src_dir = File.join(src, name)
             @dst_dir = File.join(dst, name)
-            @liquid = YAML.safe_load_file(File.join(@src_dir, '_article.yml'))
+            @liquid = YAML.safe_load_file(File.join(site.source, @src_dir, '_article.yml'))
         end
 
         def generate()
