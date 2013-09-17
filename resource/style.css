@@ -111,6 +111,37 @@ h2 {
 }
 
 
+.articlenav {
+  width: 100%;
+  display: table;
+  border-top: 1px solid;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.articlenavitem {
+    display: table-cell;
+    width: 33%;
+}
+
+.articlenavitem.previous {
+  text-align: left;
+}
+
+.articlenavitem.index {
+  text-align: center;
+}
+
+.articlenavitem.next {
+  text-align: right;
+}
+
+.articlenavitem a {
+    display: inline-block;
+    padding: 10px 10px;
+}
+
+
 #content {
   padding: 10px;
   text-align: left;

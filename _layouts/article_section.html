@@ -7,4 +7,20 @@ layout: base
 
 {{content}}
 
-<!-- TODO: nav links -->
+<div class="articlenav">
+    <div class="articlenavitem previous">
+    {% if page.index != 0 %}
+    <a href="{% expr article.sections[page.index - 1].url %}">&lt;&nbsp;{% expr article.sections[page.index - 1].name %}</a>
+    {% endif %}
+    </div>
+
+    <div class="articlenavitem index">
+    <a href="{{article.special.index.url}}">Index</a>
+    </div>
+
+    <div class="articlenavitem next">
+    {% if page.index != article.sections.size - 1 %}
+    <a href="{% expr article.sections[page.index + 1].url %}">{% expr article.sections[page.index + 1].name %}&nbsp;&gt;</a>
+    {% endif %}
+    </div>
+</div>
