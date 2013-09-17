@@ -194,25 +194,10 @@ module Jekyll
             }))
         end
 
-        def do_layout(payload, layouts)
-            info = { :filters => [Jekyll::Filters],
-                     :registers => { :site => self.site,
-                                     :page => payload['page'],
-                                     :article => payload['article'] } }
-
-            # render and transform content (this becomes the final content of the object)
-            payload["pygments_prefix"] = converter.pygments_prefix
-            payload["pygments_suffix"] = converter.pygments_suffix
-
-            self.content = self.render_liquid(self.content,
-                                                payload,
-                                                info)
-            self.transform
-
-            # output keeps track of what will finally be written
-            self.output = self.content
-
-            self.render_all_layouts(layouts, payload, info)
+        def render_liquid(content, payload, info)
+            super(content, payload, info.deep_merge({
+                registers: { article: payload['article'] }
+            }))
         end
     end
 
