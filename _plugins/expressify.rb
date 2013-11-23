@@ -24,102 +24,145 @@
 
 require 'strscan'
 
-module Jekyll
-    #
-    # This plugin aims to mitigate the abysmal failure of Liquid's expression
-    # evaluation engine by introducing a couple of new tags
-    #
-
-    #
-    # {% expr %} tag : powerful, yet safe, expression evaluation
-    #
-    # This tag aims to offer an alternative to the awkward chaining of
-    # syntactically-challenged filters. The tag accepts a large subset
-    # of Ruby expressions:
-    #     * full set of operators (unary, binary, ternary) is supported
-    #       with correct precedence and associativity
-    #     * Integer, String, Symbol, Array and Hash literals
-    #     * large whitelist of methods for Core types (no params and
-    #       no side-effects)
-    #     * access to all variables accessible in a Liquid context
-    #     * Liquid-like permissive syntax: a.b -> a['b']
-    #
-    # Examples:
-    # {% expr article.sections[page.index - 1].url %}
-    # {% expr ("hello" + 'world')[2..2*3].size.to_s[0] %}
-    # {% expr { a: [{"b" => 42}]}[:a][0].b %}
-    #
-    class ExprTag < Liquid::Tag
-        def render(context)
-            Expr.new(@markup).evaluate(context)
+#
+# Expressify provides:
+#    * Expressify::Expr : a simple class that encapsulates a safe yet powerful
+#      expression evalutor that accepts a large subset of Ruby expressions
+#    * Tags::* : a couple of Liquid tags and blocks that bring that power to
+#      Liquid templates
+#
+# Liquid tags are auto-registered if Liquid is imported before Expressify.
+#
+module Expressify
+    class EvalException < Exception
+        def initialize(str, pos, msg)
+            super("%s\n%s\n%s^" % [msg, str, " " * pos])
         end
     end
 
     #
-    # {% expr %}-powered {% if %} block
-    #
-    # This block is a drop-in replacement for the builtin {% if %} block
-    # that leverages the expression evaluator used by the {% expr %} tag
-    #
-    class IfExprBlock < Liquid::Block
-        def initialize(tag, markup, tokens)
-            @blocks = []
-            push_block('if', markup)
-            super
-        end
-
-        def unknown_tag(tag, markup, tokens)
-            if ['elsif', 'else'].include?(tag)
-                push_block(tag, markup)
-            else
-                super
-            end
-        end
-
-        def render(context)
-            context.stack do
-                @blocks.each do |block|
-                    if block[:cond].evaluate(context)
-                        return render_all(block[:data], context)
-                    end
-                end
-                ''
-            end
-        end
-
-        def push_block(tag, markup)
-            @blocks << {
-                cond: tag == 'else' ? Expr.new("true") : Expr.new(markup),
-                data: @nodelist = []
-            }
-        end
-    end
-
-    #
-    # Simple recursive-descent parser that can evaluate a large subset of Ruby
-    # expressions, with variable resolution from a Liquid context
+    # Evaluate a large but safe subset of Ruby expressions
     #
     class Expr
-        def initialize(str)
+        def initialize(str, liquid_compat = true)
             @str = str
+            @liquid_compat = liquid_compat
         end
 
-        def evaluate(context)
-            eval_expr_full(StringScanner.new(@str), context)
+        #
+        # Evaluate the expression
+        #
+        # context:       variable resolver, MUST implement []
+        #
+        # return the value of the evaluated expression or throw an exception
+        #
+        # This method is reentrant
+        #
+        def evaluate(context = nil)
+            ss = StringScanner.new(@str)
+            r = eval_expr(ss, context)
+            peek(ss)
+            error(ss.pos, "Unexpected trail") unless ss.eos?
+            r
         end
+
+        #
+        # Evaluate a whitspace-separated list of expressions
+        #
+        # context:       variable resolver, MUST implement []
+        #
+        # return the sequence of evaluated values or throw an exception
+        #
+        # This method is reentrant
+        #
+        def evaluate_list(context = nil)
+            ss = StringScanner.new(@str)
+            r = []
+            while not ss.eos?
+                r << eval_expr(ss, context)
+            end
+            r
+        end
+
+        #
+        # Method whitelisting
+        #
+        # cls:           Class of the object on which a method call is requested
+        # method:        name of method to be called
+        #
+        # return whether the method call should be allowed
+        #
+        # The default implementation withelists a number of side-effect-free
+        # methods of Ruby Core types, regardless of the value of the cls param
+        #
+        def whitelisted?(cls, method)
+            WHITELIST.has_key?(method)
+        end
+
 
     private
 
-        #
-        # Main evaluator entry point: the whole string is expected to be a valid
-        # expression.
-        #
-        def eval_expr_full(ss, context)
-            r = eval_expr(ss, context)
-            peek(ss)
-            raise SyntaxError, ss.pos, "Unexpected " + ss.rest unless ss.eos?
-            r
+        def error(pos, msg, *args)
+            raise EvalException.new(@str, pos, msg % args)
         end
+
+        SPECIAL_LITERALS = {
+            'nil' => nil,
+            'true' => true,
+            'false'=> false
+        }
+
+        ESCAPE_CHARS = {
+            't' => "\t",
+            'n' => "\n",
+            'r' => "\r",
+            'a' => "\a",
+            'b' => "\b",
+            's' => "\s"
+        }
+
+        #
+        # A whitelist of side-effect-free methods that take no parameters
+        #
+        # NB: this list is based on Ruby core types. These methods may not be
+        # safe for some exotic custom objects...
+        #
+        # Ruby 2.0 introduces the Set class in the core but to be compatible
+        # with 1.9 we use a hash instead
+        #
+        WHITELIST = Hash[ %w[
+                abs
+                bytes
+                capitalize ceil chars chop codepoints compact
+                downcase drop
+                first flatten floor
+                hex
+                intern invert
+                keys
+                last length lstrip
+                next
+                oct ord
+                reverse rotate rstrip
+                size slice sort strip succ swapcase
+                to_a to_c to_f to_h to_i to_r to_s to_sym transpose truncate
+                uniq upcase
+                values
+            ].map { |k| [k, k] }
+        ]
+
+        # for the unfortunate cases where the operator token differs from the
+        # internal Ruby symbol
+        class OpToken < String
+            def initialize(token, sym)
+                super(token)
+                @sym = sym.to_sym
+            end
+
+            def to_sym
+                @sym
+            end
+        end
+
 
         #
         # sub-expression evaluation: unfazed by trailing characters
@@ -155,15 +198,17 @@ module Jekyll
         end
 
         def eval_logical_or(ss, context)
-            eval_binary_associative(ss, context, :eval_logical_and, %w[||])
+            eval_binary_associative(ss, context, :eval_logical_and,
+                                    [OpToken.new("||", "|")]) # weird
         end
 
         def eval_logical_and(ss, context)
-            eval_binary_associative(ss, context, :eval_equality, %w[&&])
+            eval_binary_associative(ss, context, :eval_equality,
+                                    [OpToken.new("&&", "&")]) # weird
         end
 
         def eval_equality(ss, context)
-            eval_binary(ss, context, :eval_inequality, %w[<=> == === != =~ !~])
+            eval_binary(ss, context, :eval_inequality, %w[<=> == === !=])
         end
 
         def eval_inequality(ss, context)
@@ -191,7 +236,8 @@ module Jekyll
         end
 
         def eval_unary_minus(ss, context)
-            eval_unary(ss, context, :eval_pow, %w[-])
+            eval_unary(ss, context, :eval_pow, [OpToken.new("-", "-@"),
+                                                OpToken.new("+", "+@")])
         end
 
         def eval_pow(ss, context)
@@ -199,23 +245,28 @@ module Jekyll
         end
 
         def eval_not(ss, context)
-            eval_unary(ss, context, :eval_method, %w[! ~])
+            eval_unary(ss, context, :eval_deref, %w[! ~])
         end
 
-        def eval_method(ss, context)
+        def eval_deref(ss, context)
             x = eval_literal(ss, context)
             until (c = read_any(ss, ['.', '['])) == nil
-                p = ss.pos
+                p = ss.pos - 1
                 case c
                 when '.'
-                    # only deref if immediately followed by an identifer
-                    if /\W/ =~ ss.peek(1)
-                        ss.unscan
-                        break
-                    end
+                    error(p, "left operand nil") if x == nil
                     y = eval_identifier(ss)
-                    raise ArgumentError, p, "cannot deref nil" if x == nil
-                    x = resolve_ref(x, y)
+                    error(p, "right operand nil or empty") if y == nil or y.empty?
+
+                    if peek(ss, 1) == '('
+                        consume(ss, 1)
+                        a = eval_csv(ss, context)
+                        expect(ss, ')')
+                        x = eval_method(p, x, y, *a)
+                    else
+                        r = resolve_key(x, y) if @liquid_compat
+                        x = r != nil ? r : eval_method(p, x, y)
+                    end
                 when '['
                     y = eval_expr(ss, context)
                     expect(ss, ']')
@@ -225,51 +276,23 @@ module Jekyll
             x
         end
 
-        def resolve_attr(x, y)
+        def eval_method(p, x, y, *args)
+            unless x.respond_to?(y) && whitelisted?(x.class, y)
+                error(p, "no %s method for %s", y, x.class)
+            end
+            x.send(y, *args)
+        end
+
+        def resolve_key(x, y)
             if x.respond_to?(:[]) and
                     ((x.respond_to?(:has_key?) and x.has_key?(y)) or
                      (x.respond_to?(:fetch) and y.is_a?(Integer)))
-                x[y].to_liquid
+                x[y]
             else
                 nil
             end
         end
 
-        def resolve_ref(x, y)
-            r = resolve_attr(x, y)
-            # resolve some whitelisted methods
-            r == nil && x.respond_to?(y) && WHITELIST.has_key?(y) ?
-                    x.send(y).to_liquid : r
-        end
-
-        #
-        # A whitelist of side-effect-free methods that take no parameters
-        #
-        # NB: this list is based on Ruby core types. These methods may not be
-        # safe for some exotic custom objects...
-        #
-        # Ruby 2.0 introduces the Set class in the core but to be compatible
-        # with 1.9 we use a hash instead
-        #
-        WHITELIST = Hash[ %w[
-                abs
-                bytes
-                capitalize ceil chars chop codepoints compact
-                downcase drop
-                first flatten floor
-                hex
-                intern invert
-                keys
-                last length lstrip
-                next
-                oct ord
-                reverse rotate rstrip
-                size slice sort strip succ swapcase
-                to_a to_c to_f to_h to_i to_r to_s to_sym transpose truncate
-                uniq upcase
-                values
-            ].map { |k| [k, k] }
-        ]
 
         def eval_literal(ss, context)
             c = read(ss)
@@ -287,8 +310,10 @@ module Jekyll
             when ':'
                 eval_identifier(ss).to_sym
             when nil
-                raise SyntaxError, "Expected literal"
+                error(ss.pos, "expected literal")
             else
+                error(ss.pos - 1, "expected literal") unless /\w/ =~ c
+
                 x = c + ss.scan(/\w+/).to_s
 
                 if SPECIAL_LITERALS.has_key?(x)
@@ -310,20 +335,19 @@ module Jekyll
         # context:  Liquid context
         #
         def eval_array_literal(ss, context)
+            x = peek(ss, 1) == ']' ? [] : eval_csv(ss, context)
+            expect(ss, ']')
+            x
+        end
+
+        def eval_csv(ss, context)
             x = []
             while not ss.eos?
                 x << eval_expr(ss, context)
-                c = read(ss)
-                case c
-                when ']'
-                    return x
-                when ','
-                    next
-                else
-                    raise SyntaxError, ss.pos, 'Unexpected ' + c
-                end
+                break if peek(ss, 1) != ','
+                consume(ss, 1)
             end
-            raise SyntaxError, ss.pos, "Expected ']'"
+            x
         end
 
         #
@@ -334,6 +358,10 @@ module Jekyll
         #
         def eval_hash_literal(ss, context)
             x = {}
+            if peek(ss, 1) == '}'
+                consume(ss, 1)
+                return {}
+            end
             while not ss.eos?
                 k = eval_hash_key(ss)
                 v = eval_expr(ss, context)
@@ -345,16 +373,16 @@ module Jekyll
                     return x
                 when ','
                     next
-                else
-                    raise SyntaxError, ss.pos, 'Unexpected ' + c
+                when nil
+                    break
                 end
             end
-            raise SyntaxError, ss.pos, "Expected '}'"
+            error(ss.pos, "expected '}'")
         end
 
         def eval_hash_key(ss)
             case c = read(ss)
-            when '"', '"'
+            when '"', "'"
                 k = eval_string_literal(ss, c)
                 expect(ss, '=>')
             when ':'
@@ -385,25 +413,32 @@ module Jekyll
         def eval_string_literal(ss, tc)
             x = ""
             while not ss.eos?
-                c = ss.peek(1)
-                case c
-                when '\\'
-                    x << ss.getch
+                case c = ss.getch
                 when tc
-                    ss.getch
                     break
+                when '\\'
+                    x << (tc == "'" ? unescape_quote(ss) : unescape(ss))
+                else
+                    x << c
                 end
-                x << ss.getch
             end
-            raise SyntaxError, ss.pos, 'Expected ' + tc if c != tc
+            error(ss.pos, "expected %s", tc) if c != tc
             x
         end
 
-        SPECIAL_LITERALS = {
-            'nil' => nil,
-            'true' => true,
-            'false'=> false
-        }
+        def unescape_quote(ss)
+            case c = ss.getch
+            when '"', "'"
+                c
+            else
+                "\\" + c
+            end
+        end
+
+        def unescape(ss)
+            c = ss.getch
+            ESCAPE_CHARS.has_key?(c) ? ESCAPE_CHARS[c] : c
+        end
 
         #
         # Core binary operator evaluator (non-associative)
@@ -422,18 +457,7 @@ module Jekyll
         def eval_binary(ss, context, e, ops)
             x = send(e, ss, context)
             op = read_any(ss, ops)
-            p = ss.pos
-            case op
-            when nil
-                x
-            else
-                y = send(e, ss, context)
-                raise ArgumentError, p,
-                        "left operand of " + op + " is null" if x == nil
-                raise ArgumentError, p,
-                        "right operand of " + op + " is null" if y == nil
-                x.send(op.to_sym, y)
-            end
+            op == nil ? x : eval_binary_helper(ss, context, x, op, e)
         end
 
         #
@@ -453,15 +477,18 @@ module Jekyll
         def eval_binary_associative(ss, context, e, ops)
             x = send(e, ss, context)
             until (op = read_any(ss, ops)) == nil
-                p = ss.pos
-                y = send(e, ss, context)
-                raise ArgumentError, p,
-                        "left operand of " + op + " is null" if x == nil
-                raise ArgumentError, p,
-                        "right operand of " + op + " is null" if y == nil
-                x = x.send(op.to_sym, y)
+                x = eval_binary_helper(ss, context, x, op, e)
             end
             x
+        end
+
+
+        def eval_binary_helper(ss, context, x, op, e)
+            p = ss.pos
+            y = send(e, ss, context)
+            error(p - op.length, "left operand of %s is null", op) if x == nil
+            error(p - op.length, "right operand of %s is null", op) if y == nil
+            x.send(op.to_sym, y)
         end
 
         #
@@ -483,8 +510,7 @@ module Jekyll
             p = ss.pos
             x = send(e, ss, context)
             if op != nil
-                raise ArgumentError, p,
-                        "operand of " + op + " is null" if x == nil
+                error(p - op.length, "operand of %s is null", op) if x == nil
                 x.send(op.to_sym)
             else
                 x
@@ -492,7 +518,7 @@ module Jekyll
         end
 
         #
-        # Try to read any token in a given set
+        # Try to read any operator in a given set
         #
         # ss:       string scanner
         # tokens:   list of tokens to be matched (plain strings)
@@ -500,24 +526,54 @@ module Jekyll
         # return:   first match, or nil if no match
         #
         def read_any(ss, tokens)
-            ss.skip(/\s+/)
-            return nil if ss.eos?
-            tokens.each do |token|
-                if ss.peek(token.length) == token
-                    consume(ss, token.length)
-                    return token
-                end
-            end
+            op = read_op(ss)
+            return nil if op == nil
+            # to handle OpToken properly, must return the actual token instead
+            # of the matche string
+            i = tokens.index op
+            return tokens.at(i) if i != nil
+            # rewind scan pointer if the matched token is not acceptable
+            ss.pos = ss.pos - op.length
             nil
         end
 
         #
         # Either match (and consume) the given token or throw an exception
         #
-        def expect(ss, token)
-            raise SyntaxError, ss.pos,
-                    "Expected " + token unless peek(ss, token.length) == token
-            consume(ss, token.length)
+        def expect(ss, tok)
+            s = peek(ss, tok.length)
+            error(ss.pos, "expected %s", tok) unless s == tok
+            consume(ss, tok.length)
+        end
+
+        #
+        # Build a regexp matching any of the strings in the input array
+        #
+        def self.rx_any(tokens)
+            Regexp.new(tokens.map {|x| Regexp.escape(x)}.join('|'))
+        end
+
+        MULTICHAR_OP = Hash[
+            %w[
+                **
+                << >>
+                <= >= == != =~ !~ <=> ===
+                || &&
+                .. ...
+            ].map { |k| [k, k] }
+        ]
+
+        #
+        # Read either a multichar operators or a single non-whitespace char
+        # TODO: use a DFA because performace except Ruby
+        #
+        def read_op(ss)
+            ss.skip(/\s+/)
+            n = 1
+            n = n + 1 while ss.rest_size > n and MULTICHAR_OP.member? ss.peek(n + 1)
+            op = ss.peek(n)
+            consume(ss, n)
+            op.empty? ? nil : op
         end
 
         #
@@ -543,7 +599,142 @@ module Jekyll
             ss.peek(len)
         end
     end
+
+    #
+    # Integration into Liquid
+    #
+    if Object.const_defined? "Liquid"
+        module Tags
+            #
+            # {% expr %} tag : powerful, yet safe, expression evaluation
+            #
+            # This tag aims to offer an alternative to the awkward chaining of
+            # syntactically-challenged filters. The tag accepts a large subset
+            # of Ruby expressions:
+            #     * full set of operators (unary, binary, ternary) is supported
+            #       with correct precedence and associativity
+            #     * Integer, String, Symbol, Array and Hash literals
+            #     * large whitelist of methods for Core types (no params and
+            #       no side-effects)
+            #     * access to all variables accessible in a Liquid context
+            #     * Liquid-like permissive syntax: a.b -> a['b']
+            #
+            # For instance, the following vanilla Liquid:
+            #
+            # {% capture tmp %}{{ page.index | minus :1 }}{% endcapture %}
+            # {{ articles.sections[tmp].url }}
+            #
+            # can be rewritten as:
+            #
+            # {% expr article.sections[page.index - 1].url %}
+            #
+            class ExprTag < Liquid::Tag
+                def render(context)
+                    Expr.new(@markup).evaluate(context)
+                end
+            end
+
+            #
+            # {% expr %}-powered {% if %} block
+            #
+            # This block is a drop-in replacement for the builtin {% if %} block
+            # that leverages the expression evaluator used by the {% expr %} tag
+            #
+            class IfExprBlock < Liquid::Block
+                def initialize(tag, markup, tokens)
+                    @blocks = []
+                    push_block('if', markup)
+                    super
+                end
+
+                def unknown_tag(tag, markup, tokens)
+                    if ['elsif', 'else'].include?(tag)
+                        push_block(tag, markup)
+                    else
+                        super
+                    end
+                end
+
+                def render(context)
+                    context.stack do
+                        @blocks.each do |block|
+                            if block[:cond].evaluate(context)
+                                return render_all(block[:data], context)
+                            end
+                        end
+                        ''
+                    end
+                end
+
+                def push_block(tag, markup)
+                    @blocks << {
+                        cond: Expr.new(tag == 'else' ? "true" : markup),
+                        data: @nodelist = []
+                    }
+                end
+            end
+
+            #
+            # A {% raw %}-like block, {% expr %}-evaluated
+            #
+            # Useful for complex expressions whose readability benefits from a
+            # multi-line layout.
+            #
+            # For instance:
+            #
+            # {% mexpr %}
+            # [
+            #      foo,
+            #      bar,
+            #      baz
+            # ].sort.reverse
+            # {% endmexpr %}
+            #
+            class ExprBlock < Liquid::Block
+                def initialize(tag, markup, token)
+                    super
+                    @sep_expr = markup.strip
+                end
+
+                def parse(tokens)
+                    @nodelist = []
+                    @nodelist.clear
+                    @str = ""
+                    while token = tokens.shift
+                        if token =~ /\{\%\s*#{block_delimiter}\s*\%\}/
+                            end_tag
+                            break
+                        end
+                        @str << token + " " if not token.empty?
+                    end
+                end
+
+                def render(context)
+                    sep = @sep_expr.empty? ?
+                            "\n" :
+                            Expr.new(@sep_expr).evaluate(context)
+                    Expr.new(@str).evaluate_list(context).join(sep)
+                end
+            end
+        end
+
+        #
+        # Register Liquid tags
+        #
+        def self.register_liquid
+            Liquid::Template.register_tag('expr', Expressify::Tags::ExprTag)
+            Liquid::Template.register_tag('mexpr', Expressify::Tags::ExprBlock)
+            Liquid::Template.register_tag('if', Expressify::Tags::IfExprBlock)
+        end
+    end
 end
 
-Liquid::Template.register_tag('expr', Jekyll::ExprTag)
-Liquid::Template.register_tag('if', Jekyll::IfExprBlock)
+
+#
+# Only auto-register if Liquid is around
+#
+# This allows use of Expressify::Expr independently of Jekyll/Liquid
+#
+if Object.const_defined? "Liquid"
+    Expressify.register_liquid
+end
