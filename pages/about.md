@@ -6,24 +6,16 @@ title: About
 Hugues Bruant
 -------------
 
-My name is pronounced [\[yg\]](http://en.wikipedia.org/wiki/Help:IPA_for_French),
-which is usually pretty hard for anybody but French speakers. I grew up in France on a
-diet of bread, cheese and charcuterie and great was my dismay when I later discovered that
-only poor ersatz are available in the rest of the world.
+My name is pronounced [\[yg\]](http://en.wikipedia.org/wiki/Help:IPA_for_French).
+I grew up in France on a diet of bread, cheese and charcuterie.
 
-Once upon a time I wanted to work in chemistry. I came to see the error of my way after
-[two years](http://en.wikipedia.org/wiki/Classe_pr%C3%A9paratoire_aux_grandes_%C3%A9coles).
-Don't get me wrong, physics and chemistry are fascinating topics: I avidly read Max Gergel's
-[autobiography](http://www.sciencemadness.org/library/books/gergel_isopropyl_bromide.pdf)
-and Derek Lowe's [Things I Won't Work With](http://pipeline.corante.com/archives/things_i_wont_work_with/)
-is one of my favorite blogs.
+I studied physics and chemistry for a couple years then branched into Computer Science and
+Applied Mathematics. I earned a MS from [Ensimag](http://ensimag.grenoble-inp.fr/) and
+spent a semester at [CMU](http://scs.cmu.edu) as an exchange student. I interned at
+Google and ARM before joining [AeroFS](https://aerofs.com).
 
-Anyway, I ended up earning a MS in Computer Science and Applied Mathematics from
-[Ensimag](http://ensimag.grenoble-inp.fr/) and spending a semester at [CMU](http://scs.cmu.edu)
-as an exchange student. I interned at Google and ARM before joining [AeroFS](https://aerofs.com).
-
-I am a fervent Open Source believer. I have contributed to a couple of projects over
-the years and even started [a few of my own](/pages/projects.html).
+Fervent Open Source believer, I have contributed to several projects over the years
+and even started [a few of my own](/pages/projects.html).
 
 <br/>
 

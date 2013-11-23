@@ -10,6 +10,9 @@ Projects I am working on, although activity may be erratic due to lack of spare 
 
 * [Articulate](http://gitorious.org/articulate): a [Jekyll](http://jekyllrb.com) plugin
   to ease creation of long-form articles.
+* [Expressify](http://gitorious.org/expressify): a simple expression evaluator for a
+  safe subset of Ruby. Comes with glue to remedy limitations of [Liquid](https://github.com/Shopify/liquid).
+  and packaged as a [Jekyll](http://jekyllrb.com) plugin.
 * [QCodeEdit](http://qcodeedit.org): framework to create powerful text editors based on Qt4
 * [RotiDeCode](http://rotideco.de): simple text editor based on QCodeEdit **\[WIP / PLAYGROUND\]**
 
