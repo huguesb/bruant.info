@@ -45,6 +45,7 @@ cert MUST match your mail domain.
 ### Dovecot
 
 Dovecot provides a couple of different components of interest to us:
+
 * [SASL](http://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer)
   authentication with pluggable backends
 * [IMAP](http://en.wikipedia.org/wiki/Internet_Message_Access_Protocol) server
