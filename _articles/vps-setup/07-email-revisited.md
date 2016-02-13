@@ -111,7 +111,7 @@ yet so I cannot describe the process but some kind Ubuntu user made a
 
 ### Auto-encrypt
 
-I have a [GPG key](/gpg.asc), unfortunately very few of the people I correspond
+I have a GPG key, unfortunately very few of the people I correspond
 with have so much as heard of public key encryption and even those who have are
 unwilling to go through the hassle of signing/encrypting emails.
 

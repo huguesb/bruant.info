@@ -1,16 +1,16 @@
 bruant.info
 ===========
 
-Source code of <http://bruant.info>
+Source code of <https://bruant.info>
 
-Canonical repository: <http://gitorious.org/bruant-info>
+Canonical repository: <https://github.com/huguesb/bruant-info>
 
 
 License
 -------
 
 
-Copyright &copy; 2013, Hugues Bruant <hugues@bruant.info>
+Copyright &copy; 2013-2016, Hugues Bruant <hugues@bruant.info>
 
 * content (i.e. all markdown files) is available under the terms of Creative
   Commons Attribution-ShareAlike 3.0
@@ -42,16 +42,14 @@ Source structure
 Development flow
 ----------------
 
-1. Edit with text editor
-
-2. Test locally
+1. Test locally
 
     jekyll serve
 
-3. Push to gitorious
+2. Push to github
 
-    git push
+    git push origin master
 
-4. Deploy
+3. Deploy
 
     git push deploy master
