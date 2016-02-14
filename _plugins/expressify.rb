@@ -486,8 +486,8 @@ module Expressify
         def eval_binary_helper(ss, context, x, op, e)
             p = ss.pos
             y = send(e, ss, context)
-            error(p - op.length, "left operand of %s is null", op) if x == nil
-            error(p - op.length, "right operand of %s is null", op) if y == nil
+            #error(p - op.length, "left operand of %s is null", op) if x == nil
+            #error(p - op.length, "right operand of %s is null", op) if y == nil
             x.send(op.to_sym, y)
         end
 

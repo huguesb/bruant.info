@@ -1,7 +1,11 @@
 ---
-layout: page
-title: Welcome
+layout: base
+title: "|Hack⟩ + i |Chill⟩"
 ---
 
-You will find here a collection of loosely related and poorly organized items
-of debatable interest and varying levels of freshness. Have a pleasant visit.
+{% for post in site.posts %}
+  <h1 class="posttitle"><a href="{{ post.url }}">{{ post.title }}</a></h1>
+  <div class="postmeta"><div class="postdate">Posted on {{ post.date | date: "%F" }}</div></div>
+  <!-- <div class="postsummary"><p>{{ post.summary }}</p></div> -->
+{% endfor %}
+

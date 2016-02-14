@@ -8,12 +8,10 @@ Hugues Bruant
 
 My name is pronounced [\[yg\]](http://en.wikipedia.org/wiki/Help:IPA_for_French).
 
-I earned a MS in Computer Science and Applied Math from [Ensimag](http://ensimag.grenoble-inp.fr/),
-spent a semester at [CMU](http://scs.cmu.edu) as an exchange student, and interned at Google and ARM.
+I studied Computer Science and Applied Math at [Ensimag](http://ensimag.grenoble-inp.fr/),
+and [CMU](http://scs.cmu.edu).
 
-I currently work at [AeroFS](https://aerofs.com).
-
-My personal [projects](/pages/projects.html) may have some educational value.
+I currently work at [AeroFS](https://aerofs.com) and live in Toronto.
 
 <br/>
 

@@ -36,18 +36,19 @@ html, body {
 
 .navitem {
   line-height: 200%;
-  margin-top: 1px;
-  margin-bottom: 1px;
   display: inline-block;
+}
+
+.navitem a {
+  display: block;
+  padding: 1px 15px;
 }
 
 .navitem a.sitelink {
   background-color: #b58900;
   color: #fdf6e3;
 
-  text-decoration: none;
   font-weight: bold;
-  padding: 8px 15px;
 }
 
 .navitem a.sitelink:hover {
@@ -56,9 +57,6 @@ html, body {
 
 .navitem a.navlink {
   color: #b58900;
-
-  text-decoration: none;
-  padding: 8px 15px;
 }
 
 .navitem a.navlink:hover {
@@ -75,22 +73,52 @@ a:hover {
 }
 
 a.backtotop {
-    text-decoration: none;
     line-height: 200%;
     float: right;
 }
 
-#content h1.pagetitle {
-  font-size: 350%;
-  color: #859900;
-  margin-top: 10px;
-  margin-bottom: 20px;
+h1 {
+  color: #586e75;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+h1.pagetitle {
+  font-size: 250%;
+  margin-bottom: 15px;
+}
+
+h1.posttitle {
+  font-size: 160%;
 }
 
 h2 {
+/*  font-size: 120%; */
   color: #cb4b16;
   font-weight: light;
-  border-bottom: 1px solid #657b83;
+}
+
+h2.posttitle {
+/*  font-size: 150%; */
+  margin-top: 15px;
+  margin-bottom: 5px; 
+}
+
+.postmeta {
+  color: #839496;
+  background: #eee8d5;
+  width: 100%;
+  display: block;
+  font-size: 85%;
+}
+
+.postdate {
+  padding: 5px 7px;
+}
+
+.postsummary {
+  width: 100%;
+  border-bottom: 1px solid #93a1a1;
 }
 
 .contactbar {
@@ -106,10 +134,12 @@ h2 {
 }
 
 .contactitem a {
-  text-decoration: none;
   padding: 10px 40px;
 }
 
+.postnav {
+  font-size: 75%;
+}
 
 .articlenav {
   width: 100%;

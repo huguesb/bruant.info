@@ -1,14 +1,20 @@
 name: HB
-description: stuff
+description: 
 
 port:        4000
 baseurl:     /
-url:         http://bruant.info
+url:         https://bruant.info
 
 articles:      ./_articles
 articles_dest: ./articles
 
-exclude:     [README.md, bsd.txt, cc-by-sa-3.0.txt]
+exclude:     [
+    README.md,
+    bsd.txt,
+    cc-by-sa-3.0.txt,
+    Gemfile,
+    Gemfile.lock,
+]
 
 future:      true
 pygments:    true
