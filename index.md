@@ -1,6 +1,6 @@
 ---
 layout: base
-title: "|Hack⟩ + i |Chill⟩"
+title: "Discontinuous accretion of curiosities"
 ---
 
 {% for post in site.posts %}

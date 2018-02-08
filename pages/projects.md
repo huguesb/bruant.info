@@ -14,7 +14,7 @@ Bits and pieces my employer has kindly allowed me to release under an Open Sourc
 * [lipwig](https://github.com/aerofs/lipwig): Golang implementation of SSMP
 * [jssmp](https://github.com/aerofs/jssmp): Java implementation of SSMP
 * [ssmperf](https://github.com/aerofs/ssmperf): SSMP load-testing tool
-
+* [valkyrie](https://github.com/aerofs/valkyrie): Golang implementation of the Zephyr relay protocol
 
 Personal
 --------

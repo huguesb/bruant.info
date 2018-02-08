@@ -6,12 +6,12 @@ title: About
 Hugues Bruant
 -------------
 
-My name is pronounced [\[yg\]](http://en.wikipedia.org/wiki/Help:IPA_for_French).
+[\[yg\]](http://en.wikipedia.org/wiki/Help:IPA_for_French).
 
-I studied Computer Science and Applied Math at [Ensimag](http://ensimag.grenoble-inp.fr/),
+Studied Computer Science and Applied Math at [Ensimag](http://ensimag.grenoble-inp.fr/),
 and [CMU](http://scs.cmu.edu).
 
-I currently work at [AeroFS](https://aerofs.com) and live in Toronto.
+Currently working at [AeroFS](https://aerofs.com) and living in San Francisco.
 
 <br/>
 
@@ -31,4 +31,4 @@ Built with [Jekyll](http://jekyllrb.com), using the [Solarized](http://ethanscho
 color scheme, the [Open Sans](http://www.google.com/fonts#QuickUsePlace:quickUse/Family:Open+Sans)
 typeface and a [custom layout](https://github.com/huguesb/bruant.info).
 
-Running on a small [VPS](/articles/vps-setup/) hosted by [Gandi](https://gandi.net).
+Running on a small [VPS](/articles/vps-setup/).
