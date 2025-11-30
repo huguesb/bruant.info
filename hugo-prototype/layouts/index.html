@@ -1,0 +1,7 @@
+{{- /* Homepage - equivalent to index.md */ -}}
+{{ define "main" }}
+{{- range (where .Site.RegularPages "Section" "posts").ByDate.Reverse }}
+  <h1 class="posttitle"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h1>
+  <div class="postmeta"><div class="postdate">Posted on {{ .Date.Format "2006-01-02" }}</div></div>
+{{- end }}
+{{ end }}

@@ -1,0 +1,18 @@
+baseURL = "https://bruant.info/"
+languageCode = "en-us"
+title = "HB"
+
+# Replicate Jekyll's date permalink for posts
+[permalinks]
+  posts = "/:year/:month/:day/:contentbasename/"
+
+# Disable default taxonomies we don't need
+[taxonomies]
+
+# Markdown settings similar to Jekyll's maruku
+[markup.goldmark.renderer]
+  unsafe = true
+
+# Use CSS classes for syntax highlighting (solarized-dark)
+[markup.highlight]
+  noClasses = false

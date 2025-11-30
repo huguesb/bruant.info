@@ -1,0 +1,39 @@
+{{- /* Article section page - equivalent to article_section layout */ -}}
+{{ define "main" }}
+{{- $article := .Parent -}}
+{{- /* Filter out "full" page and sort by weight using sort function */ -}}
+{{- $filtered := where $article.Pages "Params.name" "!=" nil -}}
+{{- $sections := sort $filtered "Params.weight" -}}
+{{- $index := 0 -}}
+{{- range $i, $p := $sections -}}
+  {{- if eq $p.File.UniqueID $.File.UniqueID -}}
+    {{- $index = $i -}}
+  {{- end -}}
+{{- end -}}
+
+<h1 class="pagetitle">{{ $article.Title }}</h1>
+
+<h2>{{ .Params.name }}</h2>
+
+{{ .Content }}
+
+<div class="articlenav">
+    <div class="articlenavitem previous">
+    {{- if gt $index 0 -}}
+    {{- $prev := index $sections (sub $index 1) -}}
+    <a href="{{ $prev.RelPermalink }}">&lt;&nbsp;{{ $prev.Params.name }}</a>
+    {{- end -}}
+    </div>
+
+    <div class="articlenavitem index">
+    <a href="{{ $article.RelPermalink }}">Index</a>
+    </div>
+
+    <div class="articlenavitem next">
+    {{- if lt $index (sub (len $sections) 1) -}}
+    {{- $next := index $sections (add $index 1) -}}
+    <a href="{{ $next.RelPermalink }}">{{ $next.Params.name }}&nbsp;&gt;</a>
+    {{- end -}}
+    </div>
+</div>
+{{ end }}

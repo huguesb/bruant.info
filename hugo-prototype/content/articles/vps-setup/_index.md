@@ -1,0 +1,4 @@
+---
+title: VPS Setup
+synopsis: A quick guide to setting up your own email and web server on a VPS
+---

@@ -1,0 +1,22 @@
+{{- /* Article index page - equivalent to article_index layout */ -}}
+{{ define "main" }}
+<h1 class="pagetitle">{{ .Title }}</h1>
+
+{{ .Params.synopsis }}
+
+<h3>Table of contents</h3>
+
+{{- /* Filter out "full" page and sort by weight */ -}}
+{{- $filtered := where .Pages "Params.name" "!=" nil -}}
+{{- $sections := sort $filtered "Params.weight" -}}
+
+<ol>
+{{- range $sections }}
+    <li><a href="{{ .RelPermalink }}">{{ .Params.name }}</a></li>
+{{- end }}
+</ol>
+
+<br/>
+
+<a href="{{ .RelPermalink }}full/">Single page version</a>
+{{ end }}

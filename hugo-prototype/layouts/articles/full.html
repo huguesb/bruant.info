@@ -1,0 +1,25 @@
+{{- /* Article full page - equivalent to article_full layout */ -}}
+{{ define "main" }}
+{{- $article := .Parent -}}
+{{- /* Filter out "full" page and sort by weight */ -}}
+{{- $filtered := where $article.Pages "Params.name" "!=" nil -}}
+{{- $sections := sort $filtered "Params.weight" -}}
+
+<h1 class="pagetitle">{{ $article.Title }}</h1>
+
+{{ $article.Params.synopsis }}
+
+<h3>Table of contents</h3>
+
+<ol>
+{{- range $i, $section := $sections }}
+    <li><a href="#section-{{ $i }}">{{ $section.Params.name }}</a></li>
+{{- end }}
+</ol>
+
+{{- range $i, $section := $sections }}
+    <a href="#" class="backtotop">top</a>
+    <h2 id="section-{{ $i }}">{{ $section.Params.name }}</h2>
+    {{ $section.Content }}
+{{- end }}
+{{ end }}
