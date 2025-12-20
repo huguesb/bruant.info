@@ -6,10 +6,16 @@ Hugues Bruant
 
 [\[yg\]](http://en.wikipedia.org/wiki/Help:IPA_for_French).
 
+I currently live in San Francisco.
+
 Studied Computer Science and Applied Math at [Ensimag](http://ensimag.grenoble-inp.fr/),
 and [CMU](http://scs.cmu.edu).
 
-Currently working at [AeroFS](https://aerofs.com) and living in San Francisco.
+I previously worked at (in reverse chonological order):
+ - Affirm
+ - AeroFS
+ - ARM
+ - Google
 
 <br/>
 
@@ -25,8 +31,7 @@ Currently working at [AeroFS](https://aerofs.com) and living in San Francisco.
 This site
 ---------
 
-Built with [Jekyll](http://jekyllrb.com), using the [Solarized](http://ethanschoonover.com/solarized)
-color scheme, the [Open Sans](http://www.google.com/fonts#QuickUsePlace:quickUse/Family:Open+Sans)
+Built with [hugo](https://gohugo.io), using the [Solarized](https://ethanschoonover.com/solarized)
+color scheme, the [Open Sans](https://www.google.com/fonts#QuickUsePlace:quickUse/Family:Open+Sans)
 typeface and a [custom layout](https://github.com/huguesb/bruant.info).
 
-Running on a small [VPS](/articles/vps-setup/).
