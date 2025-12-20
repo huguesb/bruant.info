@@ -162,3 +162,45 @@
   .chroma .go { color:inherit }
   .chroma .gp { color:inherit }
 }
+
+/* Explicit light theme override */
+html[data-theme="light"] .bg { color:#586e75;background-color:#eee8d5; }
+html[data-theme="light"] .chroma { color:#586e75;background-color:#eee8d5; }
+html[data-theme="light"] .chroma .hl { background-color:#d6d0bf }
+html[data-theme="light"] .chroma .lnt { color:#7f7f7f }
+html[data-theme="light"] .chroma .ln { color:#7f7f7f }
+html[data-theme="light"] .chroma .k { color:#859900 }
+html[data-theme="light"] .chroma .kc { color:#859900;font-weight:bold }
+html[data-theme="light"] .chroma .kd { color:#859900 }
+html[data-theme="light"] .chroma .kn { color:#dc322f;font-weight:bold }
+html[data-theme="light"] .chroma .kt { color:#859900;font-weight:bold }
+html[data-theme="light"] .chroma .n { color:#268bd2 }
+html[data-theme="light"] .chroma .na { color:#268bd2 }
+html[data-theme="light"] .chroma .nc { color:#cb4b16 }
+html[data-theme="light"] .chroma .nb { color:#cb4b16 }
+html[data-theme="light"] .chroma .c { color:#93a1a1;font-style:italic }
+html[data-theme="light"] .chroma .c1 { color:#93a1a1;font-style:italic }
+html[data-theme="light"] .chroma .cm { color:#93a1a1;font-style:italic }
+html[data-theme="light"] .chroma .m { color:#2aa198;font-weight:bold }
+html[data-theme="light"] .chroma .mi { color:#2aa198;font-weight:bold }
+
+/* Explicit dark theme override */
+html[data-theme="dark"] .bg { color:#93a1a1;background-color:#002b36; }
+html[data-theme="dark"] .chroma { color:#93a1a1;background-color:#002b36; }
+html[data-theme="dark"] .chroma .hl { background-color:#19404a }
+html[data-theme="dark"] .chroma .lnt { color:#495050 }
+html[data-theme="dark"] .chroma .ln { color:#495050 }
+html[data-theme="dark"] .chroma .k { color:#719e07 }
+html[data-theme="dark"] .chroma .kc { color:#cb4b16;font-weight:normal }
+html[data-theme="dark"] .chroma .kd { color:#268bd2 }
+html[data-theme="dark"] .chroma .kn { color:#719e07;font-weight:normal }
+html[data-theme="dark"] .chroma .kt { color:#dc322f;font-weight:normal }
+html[data-theme="dark"] .chroma .n { color:inherit }
+html[data-theme="dark"] .chroma .na { color:inherit }
+html[data-theme="dark"] .chroma .nc { color:#268bd2 }
+html[data-theme="dark"] .chroma .nb { color:#b58900 }
+html[data-theme="dark"] .chroma .c { color:#586e75;font-style:italic }
+html[data-theme="dark"] .chroma .c1 { color:#586e75;font-style:italic }
+html[data-theme="dark"] .chroma .cm { color:#586e75;font-style:italic }
+html[data-theme="dark"] .chroma .m { color:#2aa198;font-weight:normal }
+html[data-theme="dark"] .chroma .mi { color:#2aa198;font-weight:normal }

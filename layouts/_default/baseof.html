@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html class="no-js">
   <head>
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>
     <meta charset="utf-8" />
@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="/resource/style.css" type="text/css" />
     <link rel="stylesheet" href="/resource/chroma.css" type="text/css" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <script>
+      (function() {
+        document.documentElement.classList.remove('no-js');
+        var theme = localStorage.getItem('theme');
+        if (theme) document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
   </head>
   <body>
     <div id="ywrap">
@@ -17,6 +24,14 @@
           <div class="navitem"><a class="sitelink" href="/">HB</a></div>
           <div class="navitem"><a class="navlink" href="/pages/about/">about</a></div>
           <div class="navitem"><a class="navlink" href="/pages/projects/">projects</a></div>
+          <div class="theme-picker">
+            <span class="theme-icon">&#9775;</span>
+            <div class="theme-dropdown">
+              <button onclick="setTheme('auto')">auto</button>
+              <button onclick="setTheme('light')">light</button>
+              <button onclick="setTheme('dark')">dark</button>
+            </div>
+          </div>
         </div>
 
         <div id="content">
@@ -28,5 +43,16 @@
         <p>&copy; 2018 Hugues Bruant. All Rights Reserved.</p>
       </div>
     </div>
+    <script>
+      function setTheme(theme) {
+        if (theme === 'auto') {
+          localStorage.removeItem('theme');
+          document.documentElement.removeAttribute('data-theme');
+        } else {
+          localStorage.setItem('theme', theme);
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      }
+    </script>
   </body>
 </html>
