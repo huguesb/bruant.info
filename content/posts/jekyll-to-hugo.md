@@ -1,5 +1,5 @@
 ---
-date: 2025-12-20
+date: 2025-12-19
 title: 'Migrating from Jekyll to Hugo'
 summary: 'Thanks Claude'
 ---

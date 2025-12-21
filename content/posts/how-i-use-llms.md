@@ -105,6 +105,19 @@ My preferred way of dealing with this situation, is to operate in different fold
 My hand-rolled sandbox is somewhat limited though, and in particular it doesn't meaningfully restrict network traffic. I am encouraged that Anthropic is taking [sandboxing considerations seriously](https://www.anthropic.com/engineering/claude-code-sandboxing), and look forward to a time when I can have a fine-grained networking sandbox that allows access to web search without exposing any sensitive parts of my internal network.
 
 
+And since I use a static generator for my website, I can even use Claude Code to proofread my writing, in the same terminal where I just wrote it, and let it automatically make minor fixes, with the safety net of the whole thing being version controlled :)
+
+My current prompt goes something like
+
+```
+please review the most recent post how-i-use-llms.md and let me know if you spot any spelling mistakes or other errors. feel free to share your
+opinion about content and tone as well, and any suggestion you have to improve it. please fix any obvious spelling mistakes but otherwise refrain
+from applying changes without consent
+```  
+
+I can then quickly confirm with `jj diff` that the changes make sense, and commit/squash every round of change before the next round so I can reasonably expect to catch any unexpected/unwanted modification before I publish.
+
+
 Coda: Color me impressed
 ------------------------
 
