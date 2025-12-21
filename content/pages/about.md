@@ -8,7 +8,7 @@ Hugues Bruant
 
 I currently live in San Francisco.
 
-Studied Computer Science and Applied Math at [Ensimag](http://ensimag.grenoble-inp.fr/),
+I studied Computer Science and Applied Math at [Ensimag](http://ensimag.grenoble-inp.fr/),
 and [CMU](http://scs.cmu.edu).
 
 I previously worked at (in reverse chonological order):
@@ -20,9 +20,10 @@ I previously worked at (in reverse chonological order):
 <br/>
 
 <div class="contactbar">
-  <div class="contactitem"><a href="mailto:hugues@bruant.info">Email</a></div>
+  <div class="contactitem"><a href="mailto:hugues@betakappaphi.com">Email</a></div>
   <div class="contactitem"><a href="http://www.linkedin.com/in/huguesbruant">LinkedIn</a></div>
   <div class="contactitem"><a href="https://github.com/huguesb">Github</a></div>
+  <div class="contactitem"><a href="/cv-2025.pdf">🗎 CV</a></div>
 </div>
 
 <br/>
