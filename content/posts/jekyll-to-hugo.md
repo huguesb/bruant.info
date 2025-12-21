@@ -59,7 +59,7 @@ Having done the archaeologic dig first, I decided to go even further, and have C
 Final flourishes
 ----------------
 
-Being keenly aware that all LLMs have ingested a massive corpus of HTML/CSS, and are therefore excellent in all frontend matters, an area where my own skills are much less developped, but which is thankfully extremely easy to visually validate, I decided to ask Claude for a few upgrades after the successful migration.
+Being keenly aware that all LLMs have ingested a massive corpus of HTML/CSS, and are therefore excellent in all frontend matters, an area where my own skills are much less developed, but which is thankfully extremely easy to visually validate, I decided to ask Claude for a few upgrades after the successful migration.
 
 First I had Claude update my CSS to automatically switch between light and dark version of the Solarized color scheme based on browser preference. Then I had it add a discrete drop-down at the right of the navbar to explicitly switch between light and dark, persisting the state in `localStorage`, and gracefully degrading to hiding the picker when JS is disabled.
 
