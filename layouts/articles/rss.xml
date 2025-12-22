@@ -1,0 +1,35 @@
+{{- $articles := .Sections -}}
+{{- $limit := .Site.Config.Services.RSS.Limit -}}
+{{- if ge $limit 1 -}}
+{{- $articles = $articles | first $limit -}}
+{{- end -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>{{ with .Title }}{{.}} on {{ end }}{{ .Site.Title }}</title>
+    <link>{{ .Permalink }}</link>
+    <description>Recent content in {{ .Title }} on {{ .Site.Title }}</description>
+    <generator>Hugo</generator>
+    <language>{{ site.Language.LanguageCode }}</language>
+    {{- with .OutputFormats.Get "RSS" }}
+    <atom:link href="{{.Permalink}}" rel="self" type="{{.MediaType.Type}}" />
+    {{- end }}
+    {{- range $articles }}
+    {{- /* Assemble full content from child sections */ -}}
+    {{- $filtered := where .Pages "Params.name" "!=" nil -}}
+    {{- $sections := sort $filtered "Params.weight" -}}
+    {{- $fullContent := "" -}}
+    {{- range $sections -}}
+      {{- $fullContent = printf "%s<h2>%s</h2>%s" $fullContent .Params.name .Content -}}
+    {{- end -}}
+    <item>
+      <title>{{ .Title }}</title>
+      <link>{{ .Permalink }}</link>
+      <pubDate>{{ .PublishDate.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</pubDate>
+      <guid>{{ .Permalink }}</guid>
+      <description>{{ with .Params.synopsis }}{{ . }}{{ else }}{{ .Summary | html }}{{ end }}</description>
+      <content:encoded>{{ printf "<![CDATA[%s]]>" $fullContent | safeHTML }}</content:encoded>
+    </item>
+    {{- end }}
+  </channel>
+</rss>
