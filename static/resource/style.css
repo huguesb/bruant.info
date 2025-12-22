@@ -118,6 +118,24 @@ html, body {
   color: var(--accent-hover);
 }
 
+.rss-link {
+  float: right;
+  line-height: 200%;
+  padding: 0 8px;
+  color: var(--fg-dim);
+}
+
+.rss-link:hover {
+  color: var(--accent);
+}
+
+.rss-link svg {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
 .theme-picker {
   float: right;
   position: relative;
