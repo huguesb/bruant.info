@@ -16,3 +16,9 @@ title = "HB"
 # Use CSS classes for syntax highlighting (solarized-dark)
 [markup.highlight]
   noClasses = false
+
+# Disable RSS at site level (only posts have RSS)
+[outputs]
+  home = ["HTML"]
+  section = ["HTML", "RSS"]
+  page = ["HTML"]
