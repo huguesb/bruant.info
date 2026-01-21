@@ -37,7 +37,14 @@ This approach has a number of benefits:
  - dealing with applications that spawn variable numbers of windows becomes trivial
  - the whole thing is extremely *robust* and doesn't require any arbitrary delay between steps
 
-Given a clear plan for this better approach, Claude was easily able to execute it. It fumbled on one critical aspect though: the wrapper script that was supposed to introduce the layout metadata in the process tree was `exec`-ing the underlying command instead of creating a subprocess, losing the layout metadata in the process! Oops...
+Given a clear plan for this better approach, Claude did a decent enough job. It set up solid wiring for spawning processes and tracking the resulting windows. However, it fumbled on one critical aspect: the wrapper script that was supposed to introduce the layout metadata in the process tree was `exec`-ing the underlying command instead of creating a subprocess, losing the layout metadata in the process! Oops...
+
+
+Going deep
+----------
+
+After the initial high of a working prototype, I had another unpleasant surprise: the code would always flatten the layout into a single container, instead of faithfully reproducing arbitrarily nested hierarchies. As it turns out, that's actually a fairly tricky problem to get right, given that sway neither allows empty containers, nor offers any form of placeholders for incrementally building nested hierarchies. It took me a few hours of experiments to come to terms with the severe limitations of the IPC API in that respect, and to refine the two primitives that enable a simple recursive algorithm to robustly reproduce arbitrarily nested window hierarchies. That core logic is 100% AI-free!
+
 
 Introducing sway-layout
 -----------------------
@@ -57,14 +64,42 @@ go build
 cp sway-layout /usr/local/bin
 ```
 
-To use it, create your layout config as json, in `~/.config/sway/layouts/startup.json`, for instance
+To use it, create your layout config as json, in `~/.config/sway/layouts/startup.json`.
+
+For instance, here's my ridiculously nested test config:
 
 ```json
 {
   "workspaces": {
-    "1": {"splith": ["alacritty -e btop", "alacritty"]},
-    "2": {"tabbed": ["firefox"]},
-    "3": {"splitv": ["alacritty", {"splith": ["alacritty", "alacritty"]}]}
+    "6": {
+      "splitv": [
+        {
+          "splith": [
+            "speedcrunch",
+            {
+              "tabbed": [
+                "alacritty",
+                "alacritty"
+              ]
+            },
+            {
+              "stacking": [
+                "alacritty",
+                "alacritty"
+              ]
+            }
+          ]
+        },
+        {
+          "splith": [
+            "alacritty -e btop",
+            "alacritty"
+          ]
+        },
+        "speedcrunch",
+        "alacritty -e htop"
+      ]
+    }
   }
 }
 ```
